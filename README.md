@@ -18,6 +18,6 @@ vendor/bin/phpunit
 
 ### Livrables
 - Repo GitHub avec tout le code
-- README complet
+- README résumant les actions menaient
 - Tests exécutables
 - CI (en bonus)
