@@ -6,19 +6,23 @@ namespace App;
 final class Product
 {
     private string $id;
-    private ?string $name = null;
-    private int $priceCents = 0;
+    private ?string $name;
+    private int $priceCents;
 
-    public function __construct(string $id, string $name, int|float $priceCents)
+    public function __construct(string $id, string $name, int $priceCents = 0)
     {
+        if ('' === $id || $priceCents < 0) {
+            throw new \InvalidArgumentException('Invalid product');
+        }
+
         $this->id = $id;
         $this->name = $name;
-        $this->priceCents = (int)$priceCents;
+        $this->priceCents = $priceCents;
     }
 
-    public function getPriceCents(): float
+    public function getPriceCents(): int
     {
-        return $this->priceCents / 100;
+        return $this->priceCents;
     }
 
     public function setName(string $name): string
@@ -29,7 +33,7 @@ final class Product
 
     public function equals(Product $other): bool
     {
-        return $this->id = $other->id;
+        return $this->id === $other->id;
     }
 
     public function getId(): string

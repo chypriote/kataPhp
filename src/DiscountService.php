@@ -13,11 +13,6 @@ final class DiscountService
         $paris = new DateTimeZone('UTC');
         $local = $now->setTimezone($paris);
         $month = (int)$local->format('m');
-        if ($month == 10) {
-            if ($local->format('N') === '5') {
-                return 20;
-            }
-        }
-        return 5;
+        return ($month === 11) && $local->format('N') === '5' ? 20 : 0;
     }
 }

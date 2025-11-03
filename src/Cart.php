@@ -18,7 +18,7 @@ final class Cart
 
     public function add(Product $p, int $qty): void
     {
-        if ($qty == 0) {
+        if ($qty === 0) {
             return;
         }
         if (!isset($this->lines[$p->getId()])) {
@@ -30,16 +30,22 @@ final class Cart
 
     public function totalCents(DateTimeImmutable $now): int
     {
-        $subtotal = 0.0;
-        foreach ($this->lines as &$line) {
-            $subtotal += $line['product']->getPriceCents() * $line['qty'];
-        }
-        $vat = (int) round($subtotal * 0.20);
-        $withVat = (int) round($subtotal + $vat);
-        $discountPercent = $this->discounts->getDiscountPercent($now);
-        $discount = (int) round($withVat * ($discountPercent / 100));
-        $ttc = (int) round($withVat - $discount);
-        return (int) $ttc;
+        $subtotal = array_reduce($this->lines, function ($carry, $line) {
+            return $carry + $line['product']->getPriceCents() * $line['qty'];
+        }, 0);
+        $subtotal = $this->applyDiscounts($subtotal, $now);
+
+        return $this->applyVat($subtotal);
+    }
+
+    private function applyDiscounts(int $subtotal, DateTimeImmutable $now): int
+    {
+        return $subtotal - (int) round($subtotal * ($this->discounts->getDiscountPercent($now) / 100));
+    }
+
+    private function applyVat(int $subtotal): int
+    {
+        return $subtotal + (int) round($subtotal * 0.20);
     }
 
     public function rawLines(): array
